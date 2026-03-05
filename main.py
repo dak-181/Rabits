@@ -7,9 +7,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 
-# TODO: use the formula in the readme video
-# take a starting population and double it x times
-def calculateNewPopArrays(startPop, cycles):
+# take a starting population and calculate the growth overtime, variable by rate and limited by a pop cap
+def calculateNewPopArrays(startPop, rate, cycles):
 
     counter = cycles
 
@@ -20,7 +19,7 @@ def calculateNewPopArrays(startPop, cycles):
 
     while counter > 0 :
 
-        newPopArray.append(newPopArray[-1] * 2)
+        newPopArray.append((rate * newPopArray[-1]) * (1 - newPopArray[-1]))
         cycleArray.insert(0, counter)
 
         counter = counter - 1
@@ -42,16 +41,48 @@ def getIntegerInput(prompt_message):
             print("Invalid input. Please enter a whole number.")
 
 
+# input but requires a float
+def getFloatInput(prompt_message):
+
+    while True:
+
+        user_input = input(prompt_message)
+
+        try:
+            return float(user_input)
+        
+        except ValueError:
+            print("Invalid input. Please enter a number.")
+
+
+# input but requires a float
+def getStartPopInput(prompt_message):
+
+    while True:
+
+        user_input = input(prompt_message)
+
+        try:
+            if float(user_input) >= 1 or float(user_input) <= 0 :
+                print("Invalid input. Please enter a decimal value between 0 and 1.")
+
+            else :
+                return float(user_input)
+        
+        except ValueError:
+            print("Invalid input. Please enter a decimal value between 0 and 1.")
+
 # core functions
 def main():
 
-    startPop = getIntegerInput("How many rabbits?\n")
-    cycles = getIntegerInput("How much growth?\n")
+    startPop = getStartPopInput("What percentage of total population capacity do the rabbits start at?\n")
+    cycles = getIntegerInput("How many generations?\n")
+    rate = getFloatInput("What's the growth rate?\n")
 
-    newPopArray , cycleArray = calculateNewPopArrays(startPop, cycles)
+    newPopArray , cycleArray = calculateNewPopArrays(startPop, rate, cycles)
 
     print("New rabbit population: ", newPopArray[-1])
-    #print(cycleArray, newPopArray)
+    print(cycleArray, newPopArray)
 
     plt.plot(cycleArray, newPopArray)
     plt.title("Rabbit Population Over Time")
