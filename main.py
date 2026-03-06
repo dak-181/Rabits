@@ -22,76 +22,54 @@ def calculateNewPopArrays(startPop, rate, cycles):
         newPopArray.append((rate * newPopArray[-1]) * (1 - newPopArray[-1]))
         cycleArray.insert(0, counter)
 
-        counter = counter - 1
+        counter -= 1
 
     return newPopArray, cycleArray
 
 
-# input but requires an integer
-def getIntegerInput(prompt_message):
-
-    while True:
-
-        user_input = input(prompt_message)
-
-        try:
-            return int(user_input)
-        
-        except ValueError:
-            print("Invalid input. Please enter a whole number.")
-
-
-# input but requires a float
-def getFloatInput(prompt_message):
-
-    while True:
-
-        user_input = input(prompt_message)
-
-        try:
-            return float(user_input)
-        
-        except ValueError:
-            print("Invalid input. Please enter a number.")
-
-
-# input but requires a float
-def getStartPopInput(prompt_message):
-
-    while True:
-
-        user_input = input(prompt_message)
-
-        try:
-            if float(user_input) >= 1 or float(user_input) <= 0 :
-                print("Invalid input. Please enter a decimal value between 0 and 1.")
-
-            else :
-                return float(user_input)
-        
-        except ValueError:
-            print("Invalid input. Please enter a decimal value between 0 and 1.")
-
 # core functions
 def main():
 
-    startPop = getStartPopInput("What percentage of total population capacity do the rabbits start at?\n")
-    cycles = getIntegerInput("How many generations?\n")
-    rate = getFloatInput("What's the growth rate?\n")
+    # Parameters
+    startPop = .5
+    cycles = 200
+    transient = 100
+    rate = 1
 
-    newPopArray , cycleArray = calculateNewPopArrays(startPop, rate, cycles)
+    # Set up figure
+    fig, axs = plt.subplots(2)
+    plt.tight_layout()
+    plt.show(block = False)
 
-    print("New rabbit population: ", newPopArray[-1])
-    print(cycleArray, newPopArray)
+    # Bifurcation arrays
+    allRates = []
+    allPops = []
 
-    plt.plot(cycleArray, newPopArray)
-    plt.title("Rabbit Population Over Time")
-    plt.xlabel("Years")
-    plt.ylabel("Number of Rabbits")
-    plt.grid(True)
+    while rate <= 4 :
+
+        newPopArray , cycleArray = calculateNewPopArrays(startPop, rate, cycles)
+        
+        # --- Population vs. Time subplot ---
+        axs[0].clear()
+        axs[0].set_xlim(0, cycles)
+        axs[0].set_ylim(0, 1)
+        axs[0].set_title(f"Rabbit Population Over Time (Growth Rate = {rate:.2f})")
+        axs[0].plot(cycleArray, newPopArray)
+
+        # --- Bifurcation subplot ---
+        stablePops = newPopArray[transient:]
+        stableRates = [rate] * len(stablePops)
+        allRates.extend(stableRates)
+        allPops.extend(stablePops)
+        axs[1].clear()
+        axs[1].set_title("Pop vs. Growth Rate")
+        axs[1].scatter(allRates, allPops, color='black', s=0.5)
+
+        plt.pause(0.1)
+
+        rate += 0.01
 
     plt.show()
-
 
 if __name__ == "__main__":
     main()
